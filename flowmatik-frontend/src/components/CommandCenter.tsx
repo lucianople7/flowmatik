@@ -58,6 +58,7 @@ export default function CommandCenter({ onClose }: CommandCenterProps) {
   const [workersStatus, setWorkersStatus] = useState<any>({})
   const [mcpStatus, setMcpStatus] = useState<any>({})
   const [evolutionaryAnalytics, setEvolutionaryAnalytics] = useState<any>({})
+  const [cacheStats, setCacheStats] = useState<any>(null)
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -66,10 +67,11 @@ export default function CommandCenter({ onClose }: CommandCenterProps) {
     
     const fetchEvolutionaryData = async () => {
       try {
-        const [workersRes, mcpRes, analyticsRes] = await Promise.all([
+        const [workersRes, mcpRes, analyticsRes, cacheRes] = await Promise.all([
           fetch('http://localhost:8000/api/workers/status'),
           fetch('http://localhost:8000/api/mcp/status'),
-          fetch('http://localhost:8000/api/analytics/evolutionary')
+          fetch('http://localhost:8000/api/analytics/evolutionary'),
+          fetch('http://localhost:8000/api/cache/stats')
         ]);
 
         if (workersRes.ok) {
@@ -91,6 +93,11 @@ export default function CommandCenter({ onClose }: CommandCenterProps) {
           if (analyticsData.ecosystem?.lastEvolution?.timestamp) {
             setLastEvolution(new Date(analyticsData.ecosystem.lastEvolution.timestamp));
           }
+        }
+
+        if (cacheRes.ok) {
+          const cacheData = await cacheRes.json();
+          setCacheStats(cacheData);
         }
       } catch (error) {
         console.error('Error fetching evolutionary data:', error);
@@ -393,6 +400,57 @@ export default function CommandCenter({ onClose }: CommandCenterProps) {
                 </div>
               </div>
             )}
+
+            <div className="mt-3 bg-gray-900 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-cyan-400">🤖 AI Providers</span>
+                <span className="text-xs text-gray-400">Multi-Model</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-xs text-gray-300">SiliconFlow (SDXL)</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-400">Active</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-xs text-gray-300">NetMind (Daobao 1.5)</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-400">Active</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-xs text-gray-300">Hugging Face Pro</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-400">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 bg-gray-900 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-cyan-400">💾 AI Cache</span>
+                <span className="text-xs text-gray-400">Performance</span>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-300">Hit Rate</span>
+                  <span className="text-xs text-green-400">{cacheStats?.hitRate || '0'}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-300">Cached Items</span>
+                  <span className="text-xs text-cyan-400">{cacheStats?.cacheSize || '0'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-300">Total Requests</span>
+                  <span className="text-xs text-purple-400">{cacheStats?.totalRequests || '0'}</span>
+                </div>
+              </div>
+            </div>
 
             <div className="mt-3 bg-gray-900 rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">

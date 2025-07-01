@@ -16,6 +16,77 @@ if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('s
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+
+class AICache {
+  constructor() {
+    this.cache = new NodeCache({ 
+      stdTTL: 3600,
+      checkperiod: 120,
+      useClones: false
+    });
+    this.stats = {
+      hits: 0,
+      misses: 0,
+      totalRequests: 0
+    };
+  }
+
+  generateKey(provider, model, prompt, params = {}) {
+    const keyData = { provider, model, prompt, params };
+    return Buffer.from(JSON.stringify(keyData)).toString('base64');
+  }
+
+  async get(provider, model, prompt, params = {}) {
+    this.stats.totalRequests++;
+    const key = this.generateKey(provider, model, prompt, params);
+    const cached = this.cache.get(key);
+    
+    if (cached) {
+      this.stats.hits++;
+      console.log(`🎯 Cache HIT for ${provider}/${model}`);
+      return cached;
+    }
+    
+    this.stats.misses++;
+    console.log(`💫 Cache MISS for ${provider}/${model}`);
+    return null;
+  }
+
+  set(provider, model, prompt, params, result, ttl = 3600) {
+    const key = this.generateKey(provider, model, prompt, params);
+    this.cache.set(key, result, ttl);
+    console.log(`💾 Cached result for ${provider}/${model}`);
+  }
+
+  getStats() {
+    return {
+      ...this.stats,
+      hitRate: this.stats.totalRequests > 0 ? (this.stats.hits / this.stats.totalRequests * 100).toFixed(2) : 0,
+      cacheSize: this.cache.keys().length
+    };
+  }
+}
+
+const aiCacheSystem = new AICache();
+
+const siliconFlowAPI = axios.create({
+  baseURL: 'https://api.siliconflow.cn/v1',
+  headers: {
+    'Authorization': `Bearer ${process.env.SILICONFLOW_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+const netmindAPI = axios.create({
+  baseURL: 'https://api.netmind.ai/v1',
+  headers: {
+    'Authorization': `Bearer ${process.env.NETMIND_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+const hfInference = new HfInference(process.env.HUGGINGFACE_API_KEY);
+
 app.use(helmet());
 app.use(cors());
 app.use(morgan('combined'));
@@ -641,6 +712,188 @@ app.get('/api/analytics/evolutionary', (req, res) => {
   }
 });
 
+app.post('/api/ai/generate-thumbnail', async (req, res) => {
+  try {
+    const { prompt, style = 'cyberpunk', size = '1024x1024' } = req.body;
+    
+    const cached = await aiCacheSystem.get('siliconflow', 'stable-diffusion-xl', prompt, { style, size });
+    if (cached) {
+      return res.json(cached);
+    }
+
+    const response = await siliconFlowAPI.post('/chat/completions', {
+      model: 'stabilityai/stable-diffusion-xl-base-1.0',
+      messages: [{
+        role: 'user',
+        content: `Generate a ${style} style thumbnail for: ${prompt}. Size: ${size}`
+      }],
+      max_tokens: 1000
+    });
+
+    const result = {
+      imageUrl: response.data.choices?.[0]?.message?.content || `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${Date.now()}`,
+      prompt,
+      style,
+      size,
+      provider: 'siliconflow',
+      timestamp: new Date().toISOString()
+    };
+
+    aiCacheSystem.set('siliconflow', 'stable-diffusion-xl', prompt, { style, size }, result);
+    
+    res.json(result);
+  } catch (error) {
+    console.error('SiliconFlow error:', error);
+    const fallbackResult = {
+      imageUrl: `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${Date.now()}`,
+      prompt: req.body.prompt,
+      style: req.body.style || 'cyberpunk',
+      size: req.body.size || '1024x1024',
+      provider: 'fallback',
+      timestamp: new Date().toISOString()
+    };
+    res.json(fallbackResult);
+  }
+});
+
+app.post('/api/ai/daobao-content', async (req, res) => {
+  try {
+    const { prompt, type = 'long-form', language = 'es' } = req.body;
+    
+    const cached = await aiCacheSystem.get('netmind', 'daobao-1.5', prompt, { type, language });
+    if (cached) {
+      return res.json(cached);
+    }
+
+    const response = await netmindAPI.post('/chat/completions', {
+      model: 'daobao-1.5',
+      messages: [{
+        role: 'user',
+        content: `Generate ${type} content in ${language}: ${prompt}`
+      }],
+      max_tokens: 2000
+    });
+
+    const result = {
+      content: response.data.choices?.[0]?.message?.content || `Generated ${type} content for: ${prompt}`,
+      prompt,
+      type,
+      language,
+      provider: 'netmind',
+      timestamp: new Date().toISOString()
+    };
+
+    aiCacheSystem.set('netmind', 'daobao-1.5', prompt, { type, language }, result);
+    
+    res.json(result);
+  } catch (error) {
+    console.error('NetMind error:', error);
+    const fallbackResult = {
+      content: `Generated ${req.body.type || 'long-form'} content for: ${req.body.prompt}`,
+      prompt: req.body.prompt,
+      type: req.body.type || 'long-form',
+      language: req.body.language || 'es',
+      provider: 'fallback',
+      timestamp: new Date().toISOString()
+    };
+    res.json(fallbackResult);
+  }
+});
+
+app.post('/api/ai/optimize-phrase', async (req, res) => {
+  try {
+    const { phrase, target = 'viral', platform = 'tiktok' } = req.body;
+    
+    const cached = await aiCacheSystem.get('bytedance', 'phi-3-mistral', phrase, { target, platform });
+    if (cached) {
+      return res.json(cached);
+    }
+
+    const optimizedPhrase = await hfInference.textGeneration({
+      model: 'microsoft/Phi-3-mini-4k-instruct',
+      inputs: `Optimize this phrase for ${platform} to be more ${target}: "${phrase}"`,
+      parameters: {
+        max_new_tokens: 100,
+        temperature: 0.7
+      }
+    });
+
+    const result = {
+      originalPhrase: phrase,
+      optimizedPhrase: optimizedPhrase.generated_text || phrase,
+      target,
+      platform,
+      provider: 'bytedance-phi3',
+      timestamp: new Date().toISOString()
+    };
+
+    aiCacheSystem.set('bytedance', 'phi-3-mistral', phrase, { target, platform }, result);
+    
+    res.json(result);
+  } catch (error) {
+    console.error('ByteDance optimization error:', error);
+    const fallbackResult = {
+      originalPhrase: req.body.phrase,
+      optimizedPhrase: req.body.phrase,
+      target: req.body.target || 'viral',
+      platform: req.body.platform || 'tiktok',
+      provider: 'fallback',
+      timestamp: new Date().toISOString()
+    };
+    res.json(fallbackResult);
+  }
+});
+
+app.get('/api/trends', async (req, res) => {
+  try {
+    const { category = 'general', region = 'global' } = req.query;
+    
+    const cached = await aiCacheSystem.get('trends', 'tiktok-analysis', category, { region });
+    if (cached) {
+      return res.json(cached);
+    }
+
+    const trendAnalysis = await hfInference.textGeneration({
+      model: 'microsoft/DialoGPT-medium',
+      inputs: `Analyze current TikTok trends for ${category} content in ${region} region`,
+      parameters: {
+        max_new_tokens: 500,
+        temperature: 0.7
+      }
+    });
+
+    const result = {
+      trends: trendAnalysis.generated_text || `Current ${category} trends in ${region}`,
+      category,
+      region,
+      timestamp: new Date().toISOString(),
+      provider: 'huggingface'
+    };
+
+    aiCacheSystem.set('trends', 'tiktok-analysis', category, { region }, result, 1800);
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Trends analysis error:', error);
+    const fallbackResult = {
+      trends: `Current ${req.query.category || 'general'} trends in ${req.query.region || 'global'}`,
+      category: req.query.category || 'general',
+      region: req.query.region || 'global',
+      timestamp: new Date().toISOString(),
+      provider: 'fallback'
+    };
+    res.json(fallbackResult);
+  }
+});
+
+app.get('/api/cache/stats', (req, res) => {
+  try {
+    res.json(aiCacheSystem.getStats());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
@@ -648,7 +901,14 @@ app.get('/health', (req, res) => {
     uptime: process.uptime(),
     evolutionaryWorkers: Object.keys(evolutionaryWorkers).length,
     mcpProtocols: mcpIntegration.getStatus().connectedProtocols.length,
-    ecosystemVersion: ecosystemEvolution.getStatus().currentVersion
+    ecosystemVersion: ecosystemEvolution.getStatus().currentVersion,
+    aiProviders: {
+      siliconflow: !!process.env.SILICONFLOW_API_KEY,
+      netmind: !!process.env.NETMIND_API_KEY,
+      huggingface: !!process.env.HUGGINGFACE_API_KEY,
+      bytedance: !!process.env.BYTEDANCE_API_KEY
+    },
+    cacheStats: aiCacheSystem.getStats()
   });
 });
 

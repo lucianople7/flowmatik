@@ -3,6 +3,7 @@ import Header from './components/Header'
 import Hero from './components/Hero'
 import Features from './components/Features'
 import AITeam from './components/AITeam'
+import MiniaturaGeneradas from './components/MiniaturaGeneradas'
 import CommandCenter from './components/CommandCenter'
 import Pricing from './components/Pricing'
 import Footer from './components/Footer'
@@ -22,6 +23,7 @@ function App() {
           <Hero />
           <Features />
           <AITeam />
+          <MiniaturaGeneradas />
           <Pricing />
           <Footer />
         </div>
