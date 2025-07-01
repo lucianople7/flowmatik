@@ -84,44 +84,82 @@ let agentProfiles = {};
 let users = [];
 let subscriptions = [];
 
-class EvolutionaryWorker {
-  constructor(name, capabilities) {
-    this.name = name;
-    this.capabilities = capabilities;
-    this.performance = 1.0;
-    this.adaptations = [];
-    this.lastEvolution = new Date();
-  }
+const { AdvancedAgent, agentCommunication } = require('./services/advancedAgents');
 
-  evolve() {
-    this.performance *= (1 + Math.random() * 0.1);
-    this.adaptations.push({
-      timestamp: new Date(),
-      improvement: `Enhanced ${this.capabilities[Math.floor(Math.random() * this.capabilities.length)]}`,
-      performanceGain: this.performance
-    });
-    this.lastEvolution = new Date();
-    console.log(`🧬 ${this.name} evolved: Performance ${this.performance.toFixed(2)}x`);
-  }
+const advancedAgents = {};
 
-  getStatus() {
-    return {
-      name: this.name,
-      performance: this.performance,
-      adaptations: this.adaptations.slice(-5),
-      lastEvolution: this.lastEvolution,
-      capabilities: this.capabilities
-    };
+const agentConfigs = {
+  'flowi-ceo': {
+    name: 'FLOWI CEO',
+    role: 'Strategic Objectives',
+    description: 'Define objetivos estratégicos y visión general con aprendizaje continuo',
+    avatar: '/avatars/flowi-ceo.png',
+    color: '#00ff41',
+    specialization: ['strategy', 'leadership', 'vision']
+  },
+  'hook-creator': {
+    name: 'Hook Creator',
+    role: 'Viral Content',
+    description: 'Genera frases iniciales impactantes y virales con memoria adaptativa',
+    avatar: '/avatars/hook-creator.png',
+    color: '#ff0080',
+    specialization: ['creativity', 'virality', 'engagement']
+  },
+  'thumbnail-wizard': {
+    name: 'Thumbnail Wizard',
+    role: 'Visual Design',
+    description: 'Crea miniaturas atractivas y optimizadas con aprendizaje visual',
+    avatar: '/avatars/thumbnail-wizard.png',
+    color: '#8000ff',
+    specialization: ['design', 'visual', 'optimization']
+  },
+  'editor-pro': {
+    name: 'Editor Pro',
+    role: 'Content Optimization',
+    description: 'Revisa y optimiza todo el contenido con memoria editorial',
+    avatar: '/avatars/editor-pro.png',
+    color: '#ff8000',
+    specialization: ['editing', 'optimization', 'quality']
+  },
+  'trend-researcher': {
+    name: 'Trend Researcher',
+    role: 'Market Analysis',
+    description: 'Analiza tendencias de redes sociales con inteligencia predictiva',
+    avatar: '/avatars/trend-researcher.png',
+    color: '#00ffff',
+    specialization: ['analysis', 'trends', 'prediction']
+  },
+  'optimizer': {
+    name: 'Optimizer',
+    role: 'Performance',
+    description: 'Mejora el rendimiento del contenido con algoritmos evolutivos',
+    avatar: '/avatars/optimizer.png',
+    color: '#ffff00',
+    specialization: ['performance', 'optimization', 'efficiency']
+  },
+  'data-master': {
+    name: 'Data Master',
+    role: 'Analytics',
+    description: 'Gestiona datos y métricas avanzadas con memoria analítica',
+    avatar: '/avatars/data-master.png',
+    color: '#ff4000',
+    specialization: ['analytics', 'data', 'insights']
+  },
+  'growth-expert': {
+    name: 'Growth Expert',
+    role: 'Expansion',
+    description: 'Expande alcance y crecimiento con estrategias adaptativas',
+    avatar: '/avatars/growth-expert.png',
+    color: '#4000ff',
+    specialization: ['growth', 'expansion', 'strategy']
   }
-}
-
-const evolutionaryWorkers = {
-  contentOptimizer: new EvolutionaryWorker('Content Optimizer', ['SEO', 'Engagement', 'Virality', 'Conversion']),
-  trendAnalyzer: new EvolutionaryWorker('Trend Analyzer', ['Pattern Recognition', 'Prediction', 'Market Analysis']),
-  performanceEnhancer: new EvolutionaryWorker('Performance Enhancer', ['Speed', 'Efficiency', 'Resource Management']),
-  creativityEngine: new EvolutionaryWorker('Creativity Engine', ['Innovation', 'Originality', 'Artistic Vision']),
-  dataProcessor: new EvolutionaryWorker('Data Processor', ['Analytics', 'Insights', 'Correlation Detection'])
 };
+
+Object.keys(agentConfigs).forEach(agentId => {
+  advancedAgents[agentId] = new AdvancedAgent(agentId, agentConfigs[agentId], localAI);
+});
+
+const AI_AGENTS = agentConfigs;
 
 class MCPIntegration {
   constructor() {
@@ -190,9 +228,9 @@ mcpIntegration.connectToMCP('image-analysis', process.env.MCP_ENDPOINT || 'https
 mcpIntegration.connectToMCP('trend-prediction', process.env.MCP_ENDPOINT || 'https://api.mcp.example.com');
 mcpIntegration.connectToMCP('content-optimization', process.env.MCP_ENDPOINT || 'https://api.mcp.example.com');
 
-class EcosystemEvolution {
+class AdvancedEcosystemEvolution {
   constructor() {
-    this.version = '1.0.0';
+    this.version = '2.0.0';
     this.evolutionCycle = 3 * 60 * 60 * 1000;
     this.improvements = [];
     this.startEvolutionCycle();
@@ -202,37 +240,57 @@ class EcosystemEvolution {
     setInterval(() => {
       this.evolveEcosystem();
     }, this.evolutionCycle);
-    console.log(`🌱 Ecosystem Evolution started: Every 3 hours`);
+    console.log(`🧬 Advanced Ecosystem Evolution started: Every 3 hours`);
   }
 
   evolveEcosystem() {
-    Object.values(evolutionaryWorkers).forEach(worker => worker.evolve());
+    Object.values(advancedAgents).forEach(agent => agent.evolve());
+    
+    const systemMetrics = this.analyzeSystemPerformance();
     
     const [major, minor, patch] = this.version.split('.').map(Number);
     this.version = `${major}.${minor}.${patch + 1}`;
     
     const improvements = [
-      'AI Model Performance Enhanced',
-      'Content Generation Speed Improved',
-      'Trend Prediction Accuracy Increased',
-      'User Experience Optimized',
-      'Security Protocols Updated',
-      'API Response Times Reduced',
-      'Mobile Performance Enhanced',
-      'Analytics Capabilities Expanded'
+      'Neural Learning Algorithms Enhanced',
+      'Memory Consolidation Improved',
+      'Inter-Agent Communication Optimized',
+      'Performance Adaptation Refined',
+      'Context Retention Upgraded',
+      'Collaborative Intelligence Expanded',
+      'Evolutionary Algorithms Advanced',
+      'Semantic Memory Patterns Enhanced'
     ];
     
     const newImprovement = {
       version: this.version,
       timestamp: new Date(),
-      improvements: improvements.slice(0, Math.floor(Math.random() * 4) + 2),
-      performanceGain: (Math.random() * 20 + 5).toFixed(1) + '%'
+      improvements: improvements.slice(0, Math.floor(Math.random() * 4) + 3),
+      performanceGain: (systemMetrics.averagePerformance * 10).toFixed(1) + '%',
+      systemMetrics,
+      agentEvolutions: Object.keys(advancedAgents).length
     };
     
     this.improvements.push(newImprovement);
-    console.log(`🚀 Ecosystem evolved to v${this.version}`);
+    console.log(`🚀 Advanced Ecosystem evolved to v${this.version}`);
     
     return newImprovement;
+  }
+
+  analyzeSystemPerformance() {
+    const agents = Object.values(advancedAgents);
+    const totalMemories = agents.reduce((sum, agent) => sum + agent.memory.episodicMemory.length, 0);
+    const averagePerformance = agents.reduce((sum, agent) => sum + agent.learning.performance, 0) / agents.length;
+    const totalAdaptations = agents.reduce((sum, agent) => sum + agent.learning.adaptations.length, 0);
+    
+    return {
+      totalAgents: agents.length,
+      totalMemories,
+      averagePerformance,
+      totalAdaptations,
+      communicationMessages: agentCommunication.messageQueue.length,
+      sharedKnowledgeItems: Object.keys(agentCommunication.sharedKnowledge).length
+    };
   }
 
   getStatus() {
@@ -241,119 +299,35 @@ class EcosystemEvolution {
       lastEvolution: this.improvements[this.improvements.length - 1],
       totalEvolutions: this.improvements.length,
       nextEvolution: new Date(Date.now() + this.evolutionCycle),
-      workers: Object.fromEntries(
-        Object.entries(evolutionaryWorkers).map(([key, worker]) => [key, worker.getStatus()])
+      systemMetrics: this.analyzeSystemPerformance(),
+      agents: Object.fromEntries(
+        Object.entries(advancedAgents).map(([id, agent]) => [id, agent.getStatus()])
       ),
       mcp: mcpIntegration.getStatus()
     };
   }
 }
 
-const ecosystemEvolution = new EcosystemEvolution();
+const ecosystemEvolution = new AdvancedEcosystemEvolution();
 
 
-const AI_AGENTS = {
-  'flowi-ceo': {
-    name: 'FLOWI CEO',
-    role: 'Strategic Objectives',
-    description: 'Define objetivos estratégicos y visión general',
-    avatar: '/avatars/flowi-ceo.png',
-    color: '#00ff41'
-  },
-  'hook-creator': {
-    name: 'Hook Creator',
-    role: 'Viral Content',
-    description: 'Genera frases iniciales impactantes y virales',
-    avatar: '/avatars/hook-creator.png',
-    color: '#ff0080'
-  },
-  'thumbnail-wizard': {
-    name: 'Thumbnail Wizard',
-    role: 'Visual Design',
-    description: 'Crea miniaturas atractivas y optimizadas',
-    avatar: '/avatars/thumbnail-wizard.png',
-    color: '#8000ff'
-  },
-  'editor-pro': {
-    name: 'Editor Pro',
-    role: 'Content Optimization',
-    description: 'Revisa y optimiza todo el contenido',
-    avatar: '/avatars/editor-pro.png',
-    color: '#ff8000'
-  },
-  'trend-researcher': {
-    name: 'Trend Researcher',
-    role: 'Market Analysis',
-    description: 'Analiza tendencias de redes sociales',
-    avatar: '/avatars/trend-researcher.png',
-    color: '#00ffff'
-  },
-  'optimizer': {
-    name: 'Optimizer',
-    role: 'Performance',
-    description: 'Mejora el rendimiento del contenido',
-    avatar: '/avatars/optimizer.png',
-    color: '#ffff00'
-  },
-  'data-master': {
-    name: 'Data Master',
-    role: 'Analytics',
-    description: 'Gestiona datos y métricas avanzadas',
-    avatar: '/avatars/data-master.png',
-    color: '#ff4000'
-  },
-  'growth-expert': {
-    name: 'Growth Expert',
-    role: 'Expansion',
-    description: 'Expande alcance y crecimiento',
-    avatar: '/avatars/growth-expert.png',
-    color: '#4000ff'
-  }
-};
 
-async function generateAIContent(prompt, agentType) {
+async function generateAIContent(prompt, agentType, context = {}) {
   await new Promise(resolve => setTimeout(resolve, 800));
   
-  const worker = evolutionaryWorkers.contentOptimizer;
-  const performanceMultiplier = worker ? worker.performance : 1.0;
-  
   try {
-    let aiResponse;
-    
-    try {
-      if (['flowi-ceo', 'trend-researcher', 'growth-expert'].includes(agentType)) {
-        aiResponse = await localAI.generateWithLlama3(prompt, agentType);
-      } else {
-        aiResponse = await localAI.generateWithPhi3(prompt, agentType);
-      }
-      console.log(`🦙 Local AI response generated for ${agentType}`);
-    } catch (localError) {
-      console.log('Local AI unavailable, trying MCP:', localError.message);
-      
-      try {
-        const mcpResult = await mcpIntegration.processWithMCP('text-generation', { prompt, agentType });
-        aiResponse = `MCP Enhanced: ${prompt} (Confidence: ${(mcpResult.confidence * 100).toFixed(1)}%)`;
-      } catch (mcpError) {
-        console.log('MCP unavailable, using fallback response');
-        aiResponse = `AI response for ${agentType}: ${prompt}`;
-      }
+    const agent = advancedAgents[agentType];
+    if (!agent) {
+      throw new Error(`Agent ${agentType} not found`);
     }
+
+    const content = await agent.generateContent(prompt, context);
     
-    const responses = {
-      'flowi-ceo': `🎯 OBJETIVO ESTRATÉGICO: ${prompt}\n\n${aiResponse}\n✅ Análisis completado (${performanceMultiplier.toFixed(1)}x optimizado)\n🦙 Powered by Local Llama 3.1`,
-      'hook-creator': `🔥 HOOK VIRAL GENERADO (${performanceMultiplier.toFixed(1)}x mejorado):\n\n${aiResponse}\n\n💡 Variaciones evolutivas generadas\n🦙 Powered by Local Phi-3`,
-      'thumbnail-wizard': `🎨 THUMBNAIL OPTIMIZADO (${performanceMultiplier.toFixed(1)}x enhanced):\n\n${aiResponse}\n📐 Dimensiones: 1920x1080\n🎨 Paleta: Neón cyberpunk\n🦙 Powered by Local Phi-3`,
-      'editor-pro': `✏️ CONTENIDO EDITADO (${performanceMultiplier.toFixed(1)}x optimizado):\n\n${aiResponse}\n\n📝 Mejoras aplicadas con IA local\n🦙 Powered by Local Phi-3`,
-      'trend-researcher': `📊 ANÁLISIS DE TENDENCIAS (${performanceMultiplier.toFixed(1)}x precisión):\n\n${aiResponse}\n📈 Trending score: ${(8.7 * performanceMultiplier).toFixed(1)}/10\n🦙 Powered by Local Llama 3.1`,
-      'optimizer': `⚡ OPTIMIZACIÓN COMPLETA (${performanceMultiplier.toFixed(1)}x rendimiento):\n\n${aiResponse}\n\n🚀 Rendimiento mejorado con IA local\n🦙 Powered by Local Phi-3`,
-      'data-master': `📊 ANÁLISIS DE DATOS (${performanceMultiplier.toFixed(1)}x insights):\n\n${aiResponse}\n\n📈 Métricas procesadas localmente\n🦙 Powered by Local Phi-3`,
-      'growth-expert': `🚀 ESTRATEGIA DE CRECIMIENTO (${performanceMultiplier.toFixed(1)}x expansión):\n\n${aiResponse}\n\n📈 Plan de expansión optimizado\n🦙 Powered by Local Llama 3.1`
-    };
-    
-    return responses[agentType] || aiResponse;
+    return content;
   } catch (error) {
-    console.error('All AI processing failed:', error);
-    return `Error: AI processing failed. Please ensure local AI models are running.`;
+    console.error('Advanced AI processing failed:', error);
+    
+    return `Error: Advanced AI agent ${agentType} unavailable. ${error.message}`;
   }
 }
 
@@ -587,17 +561,292 @@ app.post('/api/deploy', (req, res) => {
   });
 });
 
-app.get('/api/workers/status', (req, res) => {
+app.get('/api/agents/advanced/status', (req, res) => {
   try {
-    const workersStatus = Object.fromEntries(
-      Object.entries(evolutionaryWorkers).map(([key, worker]) => [key, worker.getStatus()])
+    const agentsStatus = Object.fromEntries(
+      Object.entries(advancedAgents).map(([id, agent]) => [id, agent.getStatus()])
     );
     
     res.json({
-      workers: workersStatus,
-      totalWorkers: Object.keys(evolutionaryWorkers).length,
-      averagePerformance: Object.values(evolutionaryWorkers)
-        .reduce((sum, worker) => sum + worker.performance, 0) / Object.keys(evolutionaryWorkers).length,
+      agents: agentsStatus,
+      totalAgents: Object.keys(advancedAgents).length,
+      averagePerformance: Object.values(advancedAgents)
+        .reduce((sum, agent) => sum + agent.learning.performance, 0) / Object.keys(advancedAgents).length,
+      communication: {
+        totalMessages: agentCommunication.messageQueue.length,
+        sharedKnowledge: Object.keys(agentCommunication.sharedKnowledge).length
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/agents/advanced/evolve', (req, res) => {
+  try {
+    const { agentId } = req.body;
+    
+    if (agentId && advancedAgents[agentId]) {
+      advancedAgents[agentId].evolve();
+      res.json({
+        message: `Agent ${agentId} evolved successfully`,
+        status: advancedAgents[agentId].getStatus()
+      });
+    } else {
+      Object.values(advancedAgents).forEach(agent => agent.evolve());
+      res.json({
+        message: 'All agents evolved successfully',
+        agents: Object.fromEntries(
+          Object.entries(advancedAgents).map(([id, agent]) => [id, agent.getStatus()])
+        )
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/agents/advanced/feedback', (req, res) => {
+  try {
+    const { agentId, interactionId, feedback } = req.body;
+    
+    if (!agentId || !feedback) {
+      return res.status(400).json({ error: 'Agent ID and feedback are required' });
+    }
+
+    const agent = advancedAgents[agentId];
+    if (!agent) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    agent.provideFeedback(interactionId, feedback);
+    
+    res.json({
+      message: 'Feedback provided successfully',
+      agentStatus: agent.getStatus()
+    });
+  } catch (error) {
+app.get('/api/agents/advanced/status', (req, res) => {
+  try {
+    const agentsStatus = Object.fromEntries(
+      Object.entries(advancedAgents).map(([id, agent]) => [id, agent.getStatus()])
+    );
+    
+    res.json({
+      agents: agentsStatus,
+      totalAgents: Object.keys(advancedAgents).length,
+      averagePerformance: Object.values(advancedAgents)
+        .reduce((sum, agent) => sum + agent.learning.performance, 0) / Object.keys(advancedAgents).length,
+      communication: {
+        totalMessages: agentCommunication.messageQueue.length,
+        sharedKnowledge: Object.keys(agentCommunication.sharedKnowledge).length
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/agents/advanced/evolve', (req, res) => {
+  try {
+    const { agentId } = req.body;
+    
+    if (agentId && advancedAgents[agentId]) {
+      advancedAgents[agentId].evolve();
+      res.json({
+        message: `Agent ${agentId} evolved successfully`,
+        status: advancedAgents[agentId].getStatus()
+      });
+    } else {
+      Object.values(advancedAgents).forEach(agent => agent.evolve());
+      res.json({
+        message: 'All agents evolved successfully',
+        agents: Object.fromEntries(
+          Object.entries(advancedAgents).map(([id, agent]) => [id, agent.getStatus()])
+        )
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/agents/advanced/feedback', (req, res) => {
+  try {
+    const { agentId, interactionId, feedback } = req.body;
+    
+    if (!agentId || !feedback) {
+      return res.status(400).json({ error: 'Agent ID and feedback are required' });
+    }
+
+    const agent = advancedAgents[agentId];
+    if (!agent) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    agent.provideFeedback(interactionId, feedback);
+    
+    res.json({
+      message: 'Feedback provided successfully',
+      agentStatus: agent.getStatus()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/agents/advanced/collaborate', async (req, res) => {
+  try {
+    const { initiatorId, partnerId, task } = req.body;
+    
+    if (!initiatorId || !partnerId || !task) {
+      return res.status(400).json({ error: 'Initiator ID, partner ID, and task are required' });
+    }
+
+    const initiator = advancedAgents[initiatorId];
+    const partner = advancedAgents[partnerId];
+    
+    if (!initiator || !partner) {
+      return res.status(404).json({ error: 'One or both agents not found' });
+    }
+
+    const collaborationId = await initiator.collaborate(partnerId, task);
+    
+    res.json({
+      collaborationId,
+      message: `Collaboration initiated between ${initiatorId} and ${partnerId}`,
+      task
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/agents/advanced/memory/:agentId', (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const { limit = 10 } = req.query;
+    
+    const agent = advancedAgents[agentId];
+    if (!agent) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    const memories = agent.memory.getRelevantMemories('', parseInt(limit));
+    
+    res.json({
+      agentId,
+      episodicMemory: memories.episodes,
+      semanticMemory: memories.semantic,
+      workingMemory: memories.context,
+      totalEpisodes: agent.memory.episodicMemory.length,
+      totalTopics: Object.keys(agent.memory.semanticMemory).length
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/agents/advanced/communication', (req, res) => {
+  try {
+    const { limit = 20 } = req.query;
+    
+    res.json({
+      recentMessages: agentCommunication.messageQueue.slice(-parseInt(limit)),
+      sharedKnowledge: agentCommunication.sharedKnowledge,
+      totalMessages: agentCommunication.messageQueue.length,
+      activeAgents: Object.keys(advancedAgents).length
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/agents/advanced/collaborate', async (req, res) => {
+  try {
+    const { initiatorId, partnerId, task } = req.body;
+    
+    if (!initiatorId || !partnerId || !task) {
+      return res.status(400).json({ error: 'Initiator ID, partner ID, and task are required' });
+    }
+
+    const initiator = advancedAgents[initiatorId];
+    const partner = advancedAgents[partnerId];
+    
+    if (!initiator || !partner) {
+      return res.status(404).json({ error: 'One or both agents not found' });
+    }
+
+    const collaborationId = await initiator.collaborate(partnerId, task);
+    
+    res.json({
+      collaborationId,
+      message: `Collaboration initiated between ${initiatorId} and ${partnerId}`,
+      task
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/agents/advanced/memory/:agentId', (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const { limit = 10 } = req.query;
+    
+    const agent = advancedAgents[agentId];
+    if (!agent) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    const memories = agent.memory.getRelevantMemories('', parseInt(limit));
+    
+    res.json({
+      agentId,
+      episodicMemory: memories.episodes,
+      semanticMemory: memories.semantic,
+      workingMemory: memories.context,
+      totalEpisodes: agent.memory.episodicMemory.length,
+      totalTopics: Object.keys(agent.memory.semanticMemory).length
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/agents/advanced/communication', (req, res) => {
+  try {
+    const { limit = 20 } = req.query;
+    
+    res.json({
+      recentMessages: agentCommunication.messageQueue.slice(-parseInt(limit)),
+      sharedKnowledge: agentCommunication.sharedKnowledge,
+      totalMessages: agentCommunication.messageQueue.length,
+      activeAgents: Object.keys(advancedAgents).length
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/workers/status', (req, res) => {
+  try {
+    const agentsStatus = Object.fromEntries(
+      Object.entries(advancedAgents).map(([id, agent]) => [id, agent.getStatus()])
+    );
+    
+    res.json({
+      workers: agentsStatus,
+      totalWorkers: Object.keys(advancedAgents).length,
+      averagePerformance: Object.values(advancedAgents)
+        .reduce((sum, agent) => sum + agent.learning.performance, 0) / Object.keys(advancedAgents).length,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -609,18 +858,18 @@ app.post('/api/workers/evolve', (req, res) => {
   try {
     const { workerName } = req.body;
     
-    if (workerName && evolutionaryWorkers[workerName]) {
-      evolutionaryWorkers[workerName].evolve();
+    if (workerName && advancedAgents[workerName]) {
+      advancedAgents[workerName].evolve();
       res.json({
         message: `Worker ${workerName} evolved successfully`,
-        status: evolutionaryWorkers[workerName].getStatus()
+        status: advancedAgents[workerName].getStatus()
       });
     } else {
-      Object.values(evolutionaryWorkers).forEach(worker => worker.evolve());
+      Object.values(advancedAgents).forEach(agent => agent.evolve());
       res.json({
         message: 'All workers evolved successfully',
         workers: Object.fromEntries(
-          Object.entries(evolutionaryWorkers).map(([key, worker]) => [key, worker.getStatus()])
+          Object.entries(advancedAgents).map(([id, agent]) => [id, agent.getStatus()])
         )
       });
     }
@@ -675,21 +924,24 @@ app.post('/api/ecosystem/evolve', (req, res) => {
 
 app.get('/api/analytics/evolutionary', (req, res) => {
   try {
-    const workersStatus = Object.fromEntries(
-      Object.entries(evolutionaryWorkers).map(([key, worker]) => [key, worker.getStatus()])
+    const agentsStatus = Object.fromEntries(
+      Object.entries(advancedAgents).map(([id, agent]) => [id, agent.getStatus()])
     );
     
     const analytics = {
       ecosystem: ecosystemEvolution.getStatus(),
-      workers: workersStatus,
+      agents: agentsStatus,
       mcp: mcpIntegration.getStatus(),
       performance: {
-        totalEvolutions: Object.values(evolutionaryWorkers)
-          .reduce((sum, worker) => sum + worker.adaptations.length, 0),
-        averagePerformance: Object.values(evolutionaryWorkers)
-          .reduce((sum, worker) => sum + worker.performance, 0) / Object.keys(evolutionaryWorkers).length,
+        totalEvolutions: Object.values(advancedAgents)
+          .reduce((sum, agent) => sum + agent.learning.adaptations.length, 0),
+        averagePerformance: Object.values(advancedAgents)
+          .reduce((sum, agent) => sum + agent.learning.performance, 0) / Object.keys(advancedAgents).length,
         systemHealth: 98.6 + (Math.random() * 1.4),
-        uptime: process.uptime()
+        uptime: process.uptime(),
+        totalMemories: Object.values(advancedAgents)
+          .reduce((sum, agent) => sum + agent.memory.episodicMemory.length, 0),
+        communicationMessages: agentCommunication.messageQueue.length
       },
       contentGeneration: {
         totalGenerated: contentHistory.length,
@@ -985,7 +1237,7 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    evolutionaryWorkers: Object.keys(evolutionaryWorkers).length,
+    advancedAgents: Object.keys(advancedAgents).length,
     mcpProtocols: mcpIntegration.getStatus().connectedProtocols.length,
     ecosystemVersion: ecosystemEvolution.getStatus().currentVersion,
     aiProviders: {
@@ -995,7 +1247,15 @@ app.get('/health', (req, res) => {
       bytedance: !!process.env.BYTEDANCE_API_KEY,
       localAI: 'enabled'
     },
-    cacheStats: aiCacheSystem.getStats()
+    cacheStats: aiCacheSystem.getStats(),
+    agentPerformance: {
+      averagePerformance: Object.values(advancedAgents)
+        .reduce((sum, agent) => sum + agent.learning.performance, 0) / Object.keys(advancedAgents).length,
+      totalMemories: Object.values(advancedAgents)
+        .reduce((sum, agent) => sum + agent.memory.episodicMemory.length, 0),
+      totalAdaptations: Object.values(advancedAgents)
+        .reduce((sum, agent) => sum + agent.learning.adaptations.length, 0)
+    }
   });
 });
 
