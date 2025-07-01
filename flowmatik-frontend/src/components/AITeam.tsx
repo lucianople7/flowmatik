@@ -67,107 +67,165 @@ const aiAgents = [
 ]
 
 const getAvatarComponent = (avatarType: string, color: string) => {
-  const create3DRobotSVG = (uniqueFeatures: JSX.Element, headShape: string = "round") => (
-    <svg viewBox="0 0 100 100" className="w-full h-full">
+  const createProfessionalAvatarSVG = (uniqueFeatures: JSX.Element, headShape: string = "round") => (
+    <svg viewBox="0 0 120 120" className="w-full h-full">
       <defs>
-        <linearGradient id={`robotGradient3D-${avatarType}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={color} />
-          <stop offset="30%" stopColor={`${color}cc`} />
-          <stop offset="70%" stopColor={color} />
-          <stop offset="100%" stopColor={`${color}88`} />
-        </linearGradient>
-        <linearGradient id={`bodyGradient3D-${avatarType}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#3a1a3a" />
-          <stop offset="50%" stopColor="#2a0a2a" />
-          <stop offset="100%" stopColor="#1a051a" />
-        </linearGradient>
+        <radialGradient id={`mainGradient-${avatarType}`} cx="50%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9"/>
+          <stop offset="20%" stopColor={color} stopOpacity="1"/>
+          <stop offset="60%" stopColor={color} stopOpacity="0.8"/>
+          <stop offset="100%" stopColor="#000000" stopOpacity="0.6"/>
+        </radialGradient>
         <linearGradient id={`metalGradient-${avatarType}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#555" />
-          <stop offset="50%" stopColor="#333" />
-          <stop offset="100%" stopColor="#111" />
+          <stop offset="0%" stopColor="#4a4a4a"/>
+          <stop offset="25%" stopColor="#3a3a3a"/>
+          <stop offset="50%" stopColor="#2a2a2a"/>
+          <stop offset="75%" stopColor="#1a1a1a"/>
+          <stop offset="100%" stopColor="#0a0a0a"/>
         </linearGradient>
-        <filter id={`glow3D-${avatarType}`}>
+        <linearGradient id={`glowGradient-${avatarType}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={color} stopOpacity="1"/>
+          <stop offset="30%" stopColor="#00ffff" stopOpacity="0.8"/>
+          <stop offset="70%" stopColor={color} stopOpacity="0.6"/>
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0.4"/>
+        </linearGradient>
+        <linearGradient id={`armorGradient-${avatarType}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6a6a6a"/>
+          <stop offset="30%" stopColor="#5a5a5a"/>
+          <stop offset="70%" stopColor="#3a3a3a"/>
+          <stop offset="100%" stopColor="#1a1a1a"/>
+        </linearGradient>
+        <filter id={`professionalGlow-${avatarType}`} x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-          <feMerge> 
+          <feMerge>
             <feMergeNode in="coloredBlur"/>
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
         <filter id={`innerShadow-${avatarType}`}>
-          <feOffset dx="1" dy="1"/>
-          <feGaussianBlur stdDeviation="1" result="offset-blur"/>
-          <feFlood floodColor="#000000" floodOpacity="0.4"/>
+          <feOffset dx="3" dy="3"/>
+          <feGaussianBlur stdDeviation="3" result="offset-blur"/>
+          <feFlood floodColor="#000000" floodOpacity="0.8"/>
           <feComposite in2="offset-blur" operator="in"/>
+          <feMerge>
+            <feMergeNode in="SourceGraphic"/>
+            <feMergeNode in="offset-blur"/>
+          </feMerge>
         </filter>
+        <pattern id={`circuitPattern-${avatarType}`} x="0" y="0" width="15" height="15" patternUnits="userSpaceOnUse">
+          <rect width="15" height="15" fill="transparent"/>
+          <path d="M0,7.5 L15,7.5 M7.5,0 L7.5,15 M3,3 L12,12 M12,3 L3,12" stroke={color} strokeWidth="0.8" opacity="0.4"/>
+          <circle cx="7.5" cy="7.5" r="1.5" fill={color} opacity="0.6"/>
+          <circle cx="3" cy="3" r="0.8" fill="#00ffff" opacity="0.8"/>
+          <circle cx="12" cy="12" r="0.8" fill="#00ffff" opacity="0.8"/>
+        </pattern>
+        <pattern id={`hexPattern-${avatarType}`} x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
+          <polygon points="6,1 10,4 10,8 6,11 2,8 2,4" fill="none" stroke={color} strokeWidth="0.5" opacity="0.3"/>
+          <circle cx="6" cy="6" r="1" fill={color} opacity="0.5"/>
+        </pattern>
       </defs>
       
-      {/* Robot Body - 3D Style */}
-      <ellipse cx="50" cy="70" rx="22" ry="18" fill={`url(#bodyGradient3D-${avatarType})`} stroke={color} strokeWidth="1.5"/>
-      <ellipse cx="50" cy="68" rx="18" ry="15" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1" filter={`url(#glow3D-${avatarType})`}/>
-      
-      {/* Body Panel */}
-      <rect x="42" y="62" width="16" height="12" rx="3" fill="#1a051a" stroke={color} strokeWidth="0.5"/>
-      <rect x="44" y="64" width="12" height="8" rx="2" fill={color} opacity="0.3"/>
-      
-      {/* Robot Head - Different Shapes */}
-      {headShape === "square" ? (
-        <rect x="35" y="25" width="30" height="25" rx="8" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="2" filter={`url(#glow3D-${avatarType})`}/>
-      ) : headShape === "hexagon" ? (
-        <polygon points="50,25 60,30 60,45 50,50 40,45 40,30" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="2" filter={`url(#glow3D-${avatarType})`}/>
-      ) : (
-        <ellipse cx="50" cy="37" rx="18" ry="20" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="2" filter={`url(#glow3D-${avatarType})`}/>
-      )}
-      
-      {/* Head Inner Panel */}
-      {headShape === "square" ? (
-        <rect x="38" y="28" width="24" height="19" rx="5" fill="#1a051a" stroke={color} strokeWidth="0.5"/>
-      ) : headShape === "hexagon" ? (
-        <polygon points="50,28 57,32 57,42 50,46 43,42 43,32" fill="#1a051a" stroke={color} strokeWidth="0.5"/>
-      ) : (
-        <ellipse cx="50" cy="37" rx="14" ry="16" fill="#1a051a" stroke={color} strokeWidth="0.5"/>
-      )}
-      
-      {/* Visor/Eye Area */}
-      <ellipse cx="50" cy="35" rx="12" ry="6" fill="#000" stroke="#00ffff" strokeWidth="1" opacity="0.8"/>
-      
-      {/* Eyes - Large and Glowing */}
-      <circle cx="44" cy="35" r="4" fill="#00ffff" className="animate-pulse">
-        <animate attributeName="fill" values="#00ffff;{color};#00ffff" dur="2s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="56" cy="35" r="4" fill="#00ffff" className="animate-pulse">
-        <animate attributeName="fill" values="#00ffff;{color};#00ffff" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+      {/* Background Energy Field */}
+      <circle cx="60" cy="60" r="58" fill={`url(#glowGradient-${avatarType})`} opacity="0.15" filter={`url(#professionalGlow-${avatarType})`}/>
+      <circle cx="60" cy="60" r="50" fill="none" stroke={color} strokeWidth="1" opacity="0.3" strokeDasharray="5,5">
+        <animateTransform attributeName="transform" type="rotate" values="0 60 60;360 60 60" dur="20s" repeatCount="indefinite"/>
       </circle>
       
-      {/* Eye Glow */}
-      <circle cx="44" cy="35" r="6" fill="none" stroke="#00ffff" strokeWidth="0.5" opacity="0.4"/>
-      <circle cx="56" cy="35" r="6" fill="none" stroke="#00ffff" strokeWidth="0.5" opacity="0.4"/>
+      {/* Advanced Torso Armor */}
+      <ellipse cx="60" cy="85" rx="32" ry="25" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="2" filter={`url(#innerShadow-${avatarType})`}/>
+      <ellipse cx="60" cy="83" rx="28" ry="21" fill={`url(#mainGradient-${avatarType})`} filter={`url(#professionalGlow-${avatarType})`}/>
+      <ellipse cx="60" cy="83" rx="24" ry="17" fill={`url(#circuitPattern-${avatarType})`} opacity="0.7"/>
       
-      {/* Mouth/Speaker */}
-      <rect x="46" y="42" width="8" height="3" rx="1.5" fill={color}/>
-      <line x1="47" y1="43" x2="47" y2="44" stroke={`${color}cc`} strokeWidth="0.5"/>
-      <line x1="49" y1="43" x2="49" y2="44" stroke={`${color}cc`} strokeWidth="0.5"/>
-      <line x1="51" y1="43" x2="51" y2="44" stroke={`${color}cc`} strokeWidth="0.5"/>
-      <line x1="53" y1="43" x2="53" y2="44" stroke={`${color}cc`} strokeWidth="0.5"/>
+      {/* Chest Panel */}
+      <rect x="50" y="75" width="20" height="16" rx="4" fill={`url(#metalGradient-${avatarType})`} stroke={color} strokeWidth="2"/>
+      <rect x="52" y="77" width="16" height="12" rx="2" fill={color} opacity="0.3"/>
+      <rect x="54" y="79" width="12" height="2" rx="1" fill="#00ffff" opacity="0.8"/>
+      <rect x="54" y="82" width="8" height="2" rx="1" fill="#00ffff" opacity="0.6"/>
+      <rect x="54" y="85" width="10" height="2" rx="1" fill="#00ffff" opacity="0.4"/>
       
-      {/* Arms - 3D Positioned */}
-      <ellipse cx="28" cy="60" rx="6" ry="12" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1" transform="rotate(-15 28 60)"/>
-      <ellipse cx="72" cy="60" rx="6" ry="12" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1" transform="rotate(15 72 60)"/>
+      {/* Professional Head Design */}
+      {headShape === "square" ? (
+        <>
+          <rect x="35" y="20" width="50" height="45" rx="15" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="3" filter={`url(#innerShadow-${avatarType})`}/>
+          <rect x="38" y="23" width="44" height="39" rx="12" fill={`url(#mainGradient-${avatarType})`} filter={`url(#professionalGlow-${avatarType})`}/>
+          <rect x="40" y="25" width="40" height="35" rx="10" fill={`url(#hexPattern-${avatarType})`} opacity="0.5"/>
+        </>
+      ) : headShape === "hexagon" ? (
+        <>
+          <polygon points="60,15 80,25 80,55 60,65 40,55 40,25" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="3" filter={`url(#innerShadow-${avatarType})`}/>
+          <polygon points="60,18 77,27 77,53 60,62 43,53 43,27" fill={`url(#mainGradient-${avatarType})`} filter={`url(#professionalGlow-${avatarType})`}/>
+          <polygon points="60,20 75,29 75,51 60,60 45,51 45,29" fill={`url(#hexPattern-${avatarType})`} opacity="0.5"/>
+        </>
+      ) : (
+        <>
+          <ellipse cx="60" cy="42" rx="28" ry="30" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="3" filter={`url(#innerShadow-${avatarType})`}/>
+          <ellipse cx="60" cy="42" rx="24" ry="26" fill={`url(#mainGradient-${avatarType})`} filter={`url(#professionalGlow-${avatarType})`}/>
+          <ellipse cx="60" cy="42" rx="20" ry="22" fill={`url(#circuitPattern-${avatarType})`} opacity="0.5"/>
+        </>
+      )}
       
-      {/* Hands */}
-      <circle cx="22" cy="70" r="5" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1"/>
-      <circle cx="78" cy="70" r="5" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1"/>
+      {/* Advanced Visor System */}
+      <ellipse cx="60" cy="38" rx="20" ry="10" fill="#000000" stroke="#00ffff" strokeWidth="3" opacity="0.95" filter={`url(#professionalGlow-${avatarType})`}/>
+      <ellipse cx="60" cy="38" rx="18" ry="8" fill={`url(#glowGradient-${avatarType})`} opacity="0.8"/>
+      <ellipse cx="60" cy="38" rx="16" ry="6" fill="#000000" opacity="0.6"/>
       
-      {/* Legs */}
-      <rect x="42" y="85" width="6" height="12" rx="3" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1"/>
-      <rect x="52" y="85" width="6" height="12" rx="3" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1"/>
+      {/* Sophisticated Eyes */}
+      <circle cx="50" cy="38" r="6" fill="#00ffff" filter={`url(#professionalGlow-${avatarType})`}>
+        <animate attributeName="fill" values="#00ffff;${color};#ffffff;${color};#00ffff" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="70" cy="38" r="6" fill="#00ffff" filter={`url(#professionalGlow-${avatarType})`}>
+        <animate attributeName="fill" values="#00ffff;${color};#ffffff;${color};#00ffff" dur="4s" repeatCount="indefinite" begin="0.5s"/>
+      </circle>
       
-      {/* Feet */}
-      <ellipse cx="45" cy="99" rx="7" ry="3" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1"/>
-      <ellipse cx="55" cy="99" rx="7" ry="3" fill={`url(#robotGradient3D-${avatarType})`} stroke={color} strokeWidth="1"/>
+      {/* Eye Details */}
+      <circle cx="50" cy="38" r="4" fill="#ffffff" opacity="0.9"/>
+      <circle cx="70" cy="38" r="4" fill="#ffffff" opacity="0.9"/>
+      <circle cx="50" cy="38" r="2" fill="#000000"/>
+      <circle cx="70" cy="38" r="2" fill="#000000"/>
+      <circle cx="50" cy="37" r="1" fill="#ffffff" opacity="0.8"/>
+      <circle cx="70" cy="37" r="1" fill="#ffffff" opacity="0.8"/>
       
-      {/* Status Lights */}
-      <circle cx="40" cy="38" r="1.5" fill="#00ff00" className="animate-pulse"/>
-      <circle cx="60" cy="38" r="1.5" fill="#ffff00" className="animate-pulse"/>
+      {/* HUD Interface Elements */}
+      <rect x="45" y="48" width="30" height="6" rx="3" fill={color} opacity="0.4"/>
+      <rect x="47" y="50" width="6" height="1" fill="#00ffff" opacity="0.9"/>
+      <rect x="55" y="50" width="8" height="1" fill="#00ffff" opacity="0.7"/>
+      <rect x="65" y="50" width="6" height="1" fill="#00ffff" opacity="0.5"/>
+      <circle cx="73" cy="50.5" r="1" fill="#00ff00" className="animate-pulse"/>
+      
+      {/* Advanced Shoulder Armor */}
+      <ellipse cx="30" cy="68" rx="12" ry="20" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="2" transform="rotate(-25 30 68)" filter={`url(#innerShadow-${avatarType})`}/>
+      <ellipse cx="90" cy="68" rx="12" ry="20" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="2" transform="rotate(25 90 68)" filter={`url(#innerShadow-${avatarType})`}/>
+      <ellipse cx="30" cy="68" rx="8" ry="16" fill={`url(#mainGradient-${avatarType})`} transform="rotate(-25 30 68)"/>
+      <ellipse cx="90" cy="68" rx="8" ry="16" fill={`url(#mainGradient-${avatarType})`} transform="rotate(25 90 68)"/>
+      
+      {/* Articulated Arms */}
+      <ellipse cx="25" cy="80" rx="8" ry="22" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="2" transform="rotate(-15 25 80)"/>
+      <ellipse cx="95" cy="80" rx="8" ry="22" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="2" transform="rotate(15 95 80)"/>
+      <ellipse cx="25" cy="80" rx="6" ry="18" fill={`url(#mainGradient-${avatarType})`} transform="rotate(-15 25 80)"/>
+      <ellipse cx="95" cy="80" rx="6" ry="18" fill={`url(#mainGradient-${avatarType})`} transform="rotate(15 95 80)"/>
+      
+      {/* Advanced Hands */}
+      <circle cx="20" cy="100" r="8" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="2"/>
+      <circle cx="100" cy="100" r="8" fill={`url(#armorGradient-${avatarType})`} stroke={color} strokeWidth="2"/>
+      <circle cx="20" cy="100" r="6" fill={`url(#mainGradient-${avatarType})`}/>
+      <circle cx="100" cy="100" r="6" fill={`url(#mainGradient-${avatarType})`}/>
+      <circle cx="20" cy="100" r="3" fill={color} opacity="0.8"/>
+      <circle cx="100" cy="100" r="3" fill={color} opacity="0.8"/>
+      
+      {/* Status Indicators */}
+      <circle cx="40" cy="28" r="2.5" fill="#00ff00" className="animate-pulse" filter={`url(#professionalGlow-${avatarType})`}/>
+      <circle cx="80" cy="28" r="2.5" fill="#ffff00" className="animate-pulse" filter={`url(#professionalGlow-${avatarType})`}/>
+      <circle cx="60" cy="22" r="2.5" fill={color} className="animate-pulse" filter={`url(#professionalGlow-${avatarType})`}/>
+      
+      {/* Power Core */}
+      <circle cx="60" cy="83" r="8" fill={color} opacity="0.9" filter={`url(#professionalGlow-${avatarType})`}>
+        <animate attributeName="r" values="8;10;8" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;1;0.9" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="60" cy="83" r="5" fill="#ffffff" opacity="0.9"/>
+      <circle cx="60" cy="83" r="3" fill={color} opacity="0.8">
+        <animate attributeName="r" values="3;4;3" dur="2s" repeatCount="indefinite"/>
+      </circle>
       
       {uniqueFeatures}
     </svg>
@@ -175,115 +233,203 @@ const getAvatarComponent = (avatarType: string, color: string) => {
   
   switch (avatarType) {
     case 'ceo':
-      return create3DRobotSVG(
+      return createProfessionalAvatarSVG(
         <>
-          <line x1="50" y1="25" x2="50" y2="15" stroke={color} strokeWidth="3"/>
-          <circle cx="50" cy="12" r="3" fill="#00ffff" className="animate-pulse"/>
-          <line x1="45" y1="27" x2="45" y2="20" stroke={color} strokeWidth="2"/>
-          <circle cx="45" cy="18" r="2" fill={color} className="animate-pulse"/>
-          <line x1="55" y1="27" x2="55" y2="20" stroke={color} strokeWidth="2"/>
-          <circle cx="55" cy="18" r="2" fill={color} className="animate-pulse"/>
-          <rect x="48" y="30" width="4" height="2" fill="#ffd700"/>
-          <circle cx="50" cy="68" r="3" fill="#00ffff" className="animate-pulse"/>
+          {/* CEO Crown and Authority Symbols */}
+          <polygon points="60,15 55,20 65,20" fill="#ffd700" stroke={color} strokeWidth="2"/>
+          <circle cx="60" cy="12" r="3" fill="#ffd700" className="animate-pulse"/>
+          <rect x="55" y="25" width="10" height="3" rx="1" fill="#ffd700" opacity="0.8"/>
+          
+          {/* Strategic Interface */}
+          <rect x="45" y="55" width="30" height="8" rx="2" fill={color} opacity="0.3"/>
+          <rect x="47" y="57" width="6" height="1" fill="#00ffff"/>
+          <rect x="55" y="57" width="8" height="1" fill="#00ffff"/>
+          <rect x="65" y="57" width="6" height="1" fill="#00ffff"/>
+          <rect x="47" y="59" width="4" height="1" fill="#ffd700"/>
+          <rect x="53" y="59" width="10" height="1" fill="#ffd700"/>
+          <rect x="65" y="59" width="8" height="1" fill="#ffd700"/>
+          
+          {/* Authority Indicators */}
+          <circle cx="45" cy="45" r="2" fill="#ffd700" className="animate-pulse"/>
+          <circle cx="75" cy="45" r="2" fill="#ffd700" className="animate-pulse"/>
         </>, "round"
       )
     case 'hook':
-      return create3DRobotSVG(
+      return createProfessionalAvatarSVG(
         <>
-          <path d="M44 25 Q50 18 56 25" stroke={color} strokeWidth="3" fill="none"/>
-          <circle cx="50" cy="16" r="2.5" fill={color} className="animate-pulse"/>
-          <rect x="42" y="47" width="2" height="4" fill={color}/>
-          <rect x="46" y="47" width="2" height="4" fill={color}/>
-          <rect x="50" y="47" width="2" height="4" fill={color}/>
-          <rect x="54" y="47" width="2" height="4" fill={color}/>
-          <rect x="58" y="47" width="2" height="4" fill={color}/>
-          <circle cx="50" cy="68" r="2" fill={color} className="animate-pulse"/>
+          {/* Hook Symbol */}
+          <path d="M45 25 Q60 15 75 25" stroke={color} strokeWidth="3" fill="none"/>
+          <circle cx="60" cy="18" r="3" fill={color} className="animate-pulse"/>
+          
+          {/* Viral Content Indicators */}
+          <path d="M40 55 L50 50 L60 55 L70 50 L80 55" stroke={color} strokeWidth="2" fill="none"/>
+          <circle cx="50" cy="50" r="2" fill="#ff1493" className="animate-pulse"/>
+          <circle cx="60" cy="55" r="2" fill="#ff1493" className="animate-pulse"/>
+          <circle cx="70" cy="50" r="2" fill="#ff1493" className="animate-pulse"/>
+          
+          {/* Engagement Metrics */}
+          <rect x="45" y="60" width="30" height="6" rx="3" fill={color} opacity="0.4"/>
+          <rect x="47" y="62" width="8" height="1" fill="#ff1493"/>
+          <rect x="57" y="62" width="12" height="1" fill="#ff1493"/>
+          <rect x="71" y="62" width="6" height="1" fill="#ff1493"/>
         </>, "round"
       )
     case 'wizard':
-      return create3DRobotSVG(
+      return createProfessionalAvatarSVG(
         <>
-          <polygon points="50,15 46,25 54,25" fill={color} stroke="#ffd700" strokeWidth="2"/>
-          <circle cx="50" cy="12" r="3" fill="#ffd700" className="animate-pulse"/>
-          <polygon points="48,20 50,15 52,20" fill="#8a2be2"/>
-          <rect x="38" y="32" width="4" height="1" fill={color}/>
-          <rect x="58" y="32" width="4" height="1" fill={color}/>
-          <circle cx="42" cy="40" r="1" fill="#8a2be2" className="animate-pulse"/>
-          <circle cx="58" cy="40" r="1" fill="#8a2be2" className="animate-pulse"/>
-          <circle cx="50" cy="68" r="2" fill="#8a2be2" className="animate-pulse"/>
+          {/* Wizard Hat */}
+          <polygon points="60,10 50,25 70,25" fill="#8a2be2" stroke="#ffd700" strokeWidth="2"/>
+          <circle cx="60" cy="8" r="3" fill="#ffd700" className="animate-pulse"/>
+          <polygon points="58,18 60,12 62,18" fill="#ffd700"/>
+          
+          {/* Magic Wand */}
+          <line x1="35" y1="70" x2="45" y2="60" stroke="#ffd700" strokeWidth="3"/>
+          <circle cx="33" cy="72" r="3" fill="#8a2be2" className="animate-pulse"/>
+          <circle cx="47" cy="58" r="2" fill="#ffd700" className="animate-pulse"/>
+          
+          {/* Magical Effects */}
+          <circle cx="40" cy="55" r="1.5" fill="#8a2be2" className="animate-pulse"/>
+          <circle cx="80" cy="60" r="1.5" fill="#8a2be2" className="animate-pulse"/>
+          <circle cx="75" cy="50" r="1" fill="#ffd700" className="animate-pulse"/>
+          
+          {/* Design Interface */}
+          <rect x="50" y="55" width="20" height="8" rx="2" fill="#8a2be2" opacity="0.3"/>
+          <rect x="52" y="57" width="4" height="4" rx="1" fill="#ffd700" opacity="0.8"/>
+          <rect x="58" y="57" width="4" height="4" rx="1" fill="#8a2be2" opacity="0.8"/>
+          <rect x="64" y="57" width="4" height="4" rx="1" fill="#00ffff" opacity="0.8"/>
         </>, "hexagon"
       )
     case 'editor':
-      return create3DRobotSVG(
+      return createProfessionalAvatarSVG(
         <>
-          <rect x="40" y="47" width="20" height="1" fill={color}/>
-          <rect x="40" y="49" width="16" height="1" fill={color} opacity="0.7"/>
-          <rect x="40" y="51" width="18" height="1" fill={color} opacity="0.5"/>
-          <rect x="40" y="53" width="14" height="1" fill={color} opacity="0.3"/>
-          <circle cx="38" cy="32" r="1" fill="#ff8c00" className="animate-pulse"/>
-          <circle cx="62" cy="32" r="1" fill="#ff8c00" className="animate-pulse"/>
-          <rect x="47" y="28" width="6" height="1" fill="#00ffff"/>
-          <circle cx="50" cy="68" r="2" fill="#ff8c00" className="animate-pulse"/>
+          {/* Editor Interface */}
+          <rect x="40" y="55" width="40" height="12" rx="3" fill={color} opacity="0.3"/>
+          <rect x="42" y="57" width="36" height="1" fill="#00ffff"/>
+          <rect x="42" y="59" width="28" height="1" fill="#00ffff" opacity="0.8"/>
+          <rect x="42" y="61" width="32" height="1" fill="#00ffff" opacity="0.6"/>
+          <rect x="42" y="63" width="24" height="1" fill="#00ffff" opacity="0.4"/>
+          
+          {/* Editing Tools */}
+          <circle cx="45" cy="45" r="2" fill="#ff8c00" className="animate-pulse"/>
+          <circle cx="75" cy="45" r="2" fill="#ff8c00" className="animate-pulse"/>
+          <rect x="55" y="25" width="10" height="2" rx="1" fill="#00ffff"/>
+          
+          {/* Correction Marks */}
+          <path d="M50 30 L55 35 L65 25" stroke="#ff8c00" strokeWidth="2" fill="none"/>
         </>, "square"
       )
     case 'researcher':
-      return create3DRobotSVG(
+      return createProfessionalAvatarSVG(
         <>
-          <rect x="40" y="47" width="2" height="5" fill={color}/>
-          <rect x="44" y="45" width="2" height="7" fill={color}/>
-          <rect x="48" y="43" width="2" height="9" fill={color}/>
-          <rect x="52" y="44" width="2" height="8" fill={color}/>
-          <rect x="56" y="46" width="2" height="6" fill={color}/>
-          <rect x="60" y="48" width="2" height="4" fill={color}/>
-          <circle cx="38" cy="32" r="1" fill="#00ff7f" className="animate-pulse"/>
-          <circle cx="62" cy="32" r="1" fill="#00ff7f" className="animate-pulse"/>
-          <circle cx="50" cy="68" r="2" fill="#00ff7f" className="animate-pulse"/>
+          {/* Data Visualization */}
+          <rect x="40" y="55" width="3" height="8" fill={color}/>
+          <rect x="45" y="52" width="3" height="11" fill={color}/>
+          <rect x="50" y="48" width="3" height="15" fill={color}/>
+          <rect x="55" y="50" width="3" height="13" fill={color}/>
+          <rect x="60" y="53" width="3" height="10" fill={color}/>
+          <rect x="65" y="56" width="3" height="7" fill={color}/>
+          <rect x="70" y="58" width="3" height="5" fill={color}/>
+          <rect x="75" y="60" width="3" height="3" fill={color}/>
+          
+          {/* Research Tools */}
+          <circle cx="45" cy="45" r="2" fill="#00ff7f" className="animate-pulse"/>
+          <circle cx="75" cy="45" r="2" fill="#00ff7f" className="animate-pulse"/>
+          
+          {/* Trend Lines */}
+          <path d="M40 65 Q50 55 60 60 Q70 50 80 55" stroke="#00ff7f" strokeWidth="2" fill="none"/>
+          <circle cx="50" cy="58" r="1.5" fill="#00ff7f" className="animate-pulse"/>
+          <circle cx="70" cy="52" r="1.5" fill="#00ff7f" className="animate-pulse"/>
         </>, "square"
       )
     case 'optimizer':
-      return create3DRobotSVG(
+      return createProfessionalAvatarSVG(
         <>
-          <circle cx="50" cy="40" r="8" fill="none" stroke={color} strokeWidth="2"/>
-          <polygon points="50,35 53,40 50,45 47,40" fill={color} className="animate-pulse"/>
-          <line x1="42" y1="40" x2="58" y2="40" stroke={color} strokeWidth="2"/>
-          <line x1="50" y1="32" x2="50" y2="48" stroke={color} strokeWidth="2"/>
-          <circle cx="38" cy="32" r="1" fill="#ffd700" className="animate-pulse"/>
-          <circle cx="62" cy="32" r="1" fill="#ffd700" className="animate-pulse"/>
-          <circle cx="50" cy="68" r="2" fill="#ffd700" className="animate-pulse"/>
+          {/* Optimization Target */}
+          <circle cx="60" cy="50" r="12" fill="none" stroke={color} strokeWidth="3"/>
+          <circle cx="60" cy="50" r="8" fill="none" stroke={color} strokeWidth="2"/>
+          <circle cx="60" cy="50" r="4" fill="none" stroke={color} strokeWidth="1"/>
+          <circle cx="60" cy="50" r="2" fill={color} className="animate-pulse"/>
+          
+          {/* Performance Arrows */}
+          <polygon points="60,38 63,45 57,45" fill={color} className="animate-pulse"/>
+          <polygon points="72,50 65,53 65,47" fill={color} className="animate-pulse"/>
+          <polygon points="60,62 57,55 63,55" fill={color} className="animate-pulse"/>
+          <polygon points="48,50 55,47 55,53" fill={color} className="animate-pulse"/>
+          
+          {/* Optimization Indicators */}
+          <circle cx="45" cy="45" r="2" fill="#ffd700" className="animate-pulse"/>
+          <circle cx="75" cy="45" r="2" fill="#ffd700" className="animate-pulse"/>
+          
+          {/* Performance Metrics */}
+          <rect x="45" y="65" width="30" height="6" rx="3" fill={color} opacity="0.3"/>
+          <rect x="47" y="67" width="26" height="1" fill="#ffd700"/>
         </>, "round"
       )
     case 'data':
-      return create3DRobotSVG(
+      return createProfessionalAvatarSVG(
         <>
-          <rect x="40" y="49" width="1.5" height="4" fill={color}/>
-          <rect x="43" y="47" width="1.5" height="6" fill={color}/>
-          <rect x="46" y="45" width="1.5" height="8" fill={color}/>
-          <rect x="49" y="46" width="1.5" height="7" fill={color}/>
-          <rect x="52" y="48" width="1.5" height="5" fill={color}/>
-          <rect x="55" y="50" width="1.5" height="3" fill={color}/>
-          <rect x="58" y="51" width="1.5" height="2" fill={color}/>
-          <circle cx="38" cy="32" r="1" fill="#ff4500" className="animate-pulse"/>
-          <circle cx="62" cy="32" r="1" fill="#ff4500" className="animate-pulse"/>
-          <circle cx="50" cy="68" r="2" fill="#ff4500" className="animate-pulse"/>
+          {/* Data Bars */}
+          <rect x="40" y="58" width="2" height="6" fill={color}/>
+          <rect x="44" y="55" width="2" height="9" fill={color}/>
+          <rect x="48" y="52" width="2" height="12" fill={color}/>
+          <rect x="52" y="54" width="2" height="10" fill={color}/>
+          <rect x="56" y="56" width="2" height="8" fill={color}/>
+          <rect x="60" y="59" width="2" height="5" fill={color}/>
+          <rect x="64" y="57" width="2" height="7" fill={color}/>
+          <rect x="68" y="60" width="2" height="4" fill={color}/>
+          <rect x="72" y="61" width="2" height="3" fill={color}/>
+          <rect x="76" y="62" width="2" height="2" fill={color}/>
+          
+          {/* Database Symbol */}
+          <ellipse cx="60" cy="25" rx="8" ry="3" fill={color} opacity="0.8"/>
+          <ellipse cx="60" cy="30" rx="8" ry="3" fill={color} opacity="0.6"/>
+          <ellipse cx="60" cy="35" rx="8" ry="3" fill={color} opacity="0.4"/>
+          
+          {/* Data Flow */}
+          <circle cx="45" cy="45" r="2" fill="#ff4500" className="animate-pulse"/>
+          <circle cx="75" cy="45" r="2" fill="#ff4500" className="animate-pulse"/>
+          
+          {/* Analytics Interface */}
+          <rect x="45" y="68" width="30" height="4" rx="2" fill={color} opacity="0.3"/>
+          <rect x="47" y="69" width="8" height="1" fill="#ff4500"/>
+          <rect x="57" y="69" width="12" height="1" fill="#ff4500"/>
+          <rect x="71" y="69" width="6" height="1" fill="#ff4500"/>
         </>, "square"
       )
     case 'growth':
-      return create3DRobotSVG(
+      return createProfessionalAvatarSVG(
         <>
-          <path d="M40 50 L44 46 L48 48 L52 44 L56 46 L60 42" stroke={color} strokeWidth="3" fill="none"/>
-          <polygon points="58,42 60,40 62,44 60,46" fill={color}/>
-          <circle cx="40" cy="50" r="1.5" fill={color}/>
-          <circle cx="44" cy="46" r="1.5" fill={color}/>
-          <circle cx="48" cy="48" r="1.5" fill={color}/>
-          <circle cx="52" cy="44" r="1.5" fill={color}/>
-          <circle cx="56" cy="46" r="1.5" fill={color}/>
-          <circle cx="38" cy="32" r="1" fill="#9370db" className="animate-pulse"/>
-          <circle cx="62" cy="32" r="1" fill="#9370db" className="animate-pulse"/>
-          <circle cx="50" cy="68" r="2" fill="#9370db" className="animate-pulse"/>
+          {/* Growth Arrow */}
+          <path d="M35 65 L45 55 L55 60 L65 50 L75 55 L85 45" stroke={color} strokeWidth="4" fill="none"/>
+          <polygon points="83,45 85,42 87,47 85,48" fill={color}/>
+          
+          {/* Growth Points */}
+          <circle cx="45" cy="55" r="2" fill={color} className="animate-pulse"/>
+          <circle cx="55" cy="60" r="2" fill={color} className="animate-pulse"/>
+          <circle cx="65" cy="50" r="2" fill={color} className="animate-pulse"/>
+          <circle cx="75" cy="55" r="2" fill={color} className="animate-pulse"/>
+          
+          {/* Expansion Indicators */}
+          <circle cx="40" cy="40" r="3" fill="none" stroke="#9370db" strokeWidth="1">
+            <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="80" cy="35" r="3" fill="none" stroke="#9370db" strokeWidth="1">
+            <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" begin="1s"/>
+          </circle>
+          
+          {/* Growth Metrics */}
+          <circle cx="45" cy="45" r="2" fill="#9370db" className="animate-pulse"/>
+          <circle cx="75" cy="45" r="2" fill="#9370db" className="animate-pulse"/>
+          
+          {/* Expansion Interface */}
+          <rect x="45" y="70" width="30" height="6" rx="3" fill={color} opacity="0.3"/>
+          <rect x="47" y="72" width="6" height="1" fill="#9370db"/>
+          <rect x="55" y="72" width="10" height="1" fill="#9370db"/>
+          <rect x="67" y="72" width="8" height="1" fill="#9370db"/>
         </>, "hexagon"
       )
     default:
-      return create3DRobotSVG(<></>, "round")
+      return createProfessionalAvatarSVG(<></>, "round")
   }
 }
 
