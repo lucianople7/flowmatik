@@ -9,15 +9,11 @@
       }
     },
     {
-      "src": "flowmatik-backend/server.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/flowmatik-backend/server.js"
-    },
     {
       "src": "/(.*)",
       "dest": "/flowmatik-frontend/dist/$1"
@@ -27,7 +23,7 @@
     "NODE_ENV": "production"
   },
   "functions": {
-    "flowmatik-backend/server.js": {
+    "api/**/*.js": {
       "maxDuration": 30
     }
   }
