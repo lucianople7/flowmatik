@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@huggingface/inference": "^4.2.0",
+    "@siliconflow/si-cli": "^0.1.8",
+    "axios": "^1.10.0",
+    "n8n-nodes-netmind": "^0.2.0",
+    "n8n-nodes-siliconflow": "^1.2.3",
+    "node-cache": "^5.1.2"
+  }
+}
