@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const NodeCache = require('node-cache');
 
 let stripe = null;
 if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith('sk_')) {
@@ -69,23 +70,8 @@ class AICache {
 
 const aiCacheSystem = new AICache();
 
-const siliconFlowAPI = axios.create({
-  baseURL: 'https://api.siliconflow.cn/v1',
-  headers: {
-    'Authorization': `Bearer ${process.env.SILICONFLOW_API_KEY}`,
-    'Content-Type': 'application/json'
-  }
-});
-
-const netmindAPI = axios.create({
-  baseURL: 'https://api.netmind.ai/v1',
-  headers: {
-    'Authorization': `Bearer ${process.env.NETMIND_API_KEY}`,
-    'Content-Type': 'application/json'
-  }
-});
-
-const hfInference = new HfInference(process.env.HUGGINGFACE_API_KEY);
+const LocalAIService = require('./services/localAI');
+const localAI = new LocalAIService();
 
 app.use(helmet());
 app.use(cors());
@@ -332,35 +318,42 @@ async function generateAIContent(prompt, agentType) {
   const performanceMultiplier = worker ? worker.performance : 1.0;
   
   try {
-    const mcpResult = await mcpIntegration.processWithMCP('text-generation', { prompt, agentType });
+    let aiResponse;
+    
+    try {
+      if (['flowi-ceo', 'trend-researcher', 'growth-expert'].includes(agentType)) {
+        aiResponse = await localAI.generateWithLlama3(prompt, agentType);
+      } else {
+        aiResponse = await localAI.generateWithPhi3(prompt, agentType);
+      }
+      console.log(`🦙 Local AI response generated for ${agentType}`);
+    } catch (localError) {
+      console.log('Local AI unavailable, trying MCP:', localError.message);
+      
+      try {
+        const mcpResult = await mcpIntegration.processWithMCP('text-generation', { prompt, agentType });
+        aiResponse = `MCP Enhanced: ${prompt} (Confidence: ${(mcpResult.confidence * 100).toFixed(1)}%)`;
+      } catch (mcpError) {
+        console.log('MCP unavailable, using fallback response');
+        aiResponse = `AI response for ${agentType}: ${prompt}`;
+      }
+    }
     
     const responses = {
-      'flowi-ceo': `🎯 OBJETIVO ESTRATÉGICO: ${prompt}\n\n✅ Análisis completado (${performanceMultiplier.toFixed(1)}x optimizado)\n✅ Estrategia definida con MCP\n✅ KPIs establecidos\n🧬 Confianza: ${(mcpResult.confidence * 100).toFixed(1)}%`,
-      'hook-creator': `🔥 HOOK VIRAL GENERADO (${performanceMultiplier.toFixed(1)}x mejorado):\n\n"${prompt}" - ¡Este contenido va a explotar!\n\n💡 Variaciones evolutivas:\n• Versión corta optimizada\n• Versión emocional MCP-enhanced\n• Versión controversial adaptativa\n🧬 Predicción viral: ${(mcpResult.confidence * 100).toFixed(1)}%`,
-      'thumbnail-wizard': `🎨 THUMBNAIL OPTIMIZADO (${performanceMultiplier.toFixed(1)}x enhanced):\n\nConcepto: ${prompt}\n📐 Dimensiones: 1920x1080\n🎨 Paleta: Neón cyberpunk evolutivo\n⚡ CTR estimado: +${(45 * performanceMultiplier).toFixed(0)}%\n🧬 MCP Vision Score: ${(mcpResult.confidence * 100).toFixed(1)}%`,
-      'editor-pro': `✏️ CONTENIDO EDITADO (${performanceMultiplier.toFixed(1)}x optimizado):\n\n${prompt}\n\n📝 Mejoras evolutivas aplicadas:\n• Gramática optimizada con IA\n• SEO mejorado adaptativamente\n• Engagement aumentado +${(25 * performanceMultiplier).toFixed(0)}%\n🧬 Calidad MCP: ${(mcpResult.confidence * 100).toFixed(1)}%`,
-      'trend-researcher': `📊 ANÁLISIS DE TENDENCIAS (${performanceMultiplier.toFixed(1)}x precisión):\n\nTema: ${prompt}\n📈 Trending score: ${(8.7 * performanceMultiplier).toFixed(1)}/10\n🔥 Hashtags recomendados evolutivos\n⏰ Mejor momento para publicar\n🧬 Predicción MCP: ${(mcpResult.confidence * 100).toFixed(1)}%`,
-      'optimizer': `⚡ OPTIMIZACIÓN COMPLETA (${performanceMultiplier.toFixed(1)}x rendimiento):\n\n${prompt}\n\n🚀 Rendimiento evolutivo mejorado:\n• Velocidad +${(30 * performanceMultiplier).toFixed(0)}%\n• Conversión +${(25 * performanceMultiplier).toFixed(0)}%\n• Retención +${(40 * performanceMultiplier).toFixed(0)}%\n🧬 Eficiencia MCP: ${(mcpResult.confidence * 100).toFixed(1)}%`,
-      'data-master': `📊 ANÁLISIS DE DATOS (${performanceMultiplier.toFixed(1)}x insights):\n\nInput: ${prompt}\n\n📈 Métricas evolutivas:\n• Alcance: ${Math.floor(50000 * performanceMultiplier)}+\n• Engagement: ${(12 * performanceMultiplier).toFixed(1)}%\n• Conversión: ${(3.2 * performanceMultiplier).toFixed(1)}%\n🧬 Precisión MCP: ${(mcpResult.confidence * 100).toFixed(1)}%`,
-      'growth-expert': `🚀 ESTRATEGIA DE CRECIMIENTO (${performanceMultiplier.toFixed(1)}x expansión):\n\n${prompt}\n\n📈 Plan evolutivo de expansión:\n• Audiencia objetivo optimizada\n• Canales de distribución adaptativos\n• Escalabilidad ${(10 * performanceMultiplier).toFixed(0)}x\n🧬 Potencial MCP: ${(mcpResult.confidence * 100).toFixed(1)}%`
+      'flowi-ceo': `🎯 OBJETIVO ESTRATÉGICO: ${prompt}\n\n${aiResponse}\n✅ Análisis completado (${performanceMultiplier.toFixed(1)}x optimizado)\n🦙 Powered by Local Llama 3.1`,
+      'hook-creator': `🔥 HOOK VIRAL GENERADO (${performanceMultiplier.toFixed(1)}x mejorado):\n\n${aiResponse}\n\n💡 Variaciones evolutivas generadas\n🦙 Powered by Local Phi-3`,
+      'thumbnail-wizard': `🎨 THUMBNAIL OPTIMIZADO (${performanceMultiplier.toFixed(1)}x enhanced):\n\n${aiResponse}\n📐 Dimensiones: 1920x1080\n🎨 Paleta: Neón cyberpunk\n🦙 Powered by Local Phi-3`,
+      'editor-pro': `✏️ CONTENIDO EDITADO (${performanceMultiplier.toFixed(1)}x optimizado):\n\n${aiResponse}\n\n📝 Mejoras aplicadas con IA local\n🦙 Powered by Local Phi-3`,
+      'trend-researcher': `📊 ANÁLISIS DE TENDENCIAS (${performanceMultiplier.toFixed(1)}x precisión):\n\n${aiResponse}\n📈 Trending score: ${(8.7 * performanceMultiplier).toFixed(1)}/10\n🦙 Powered by Local Llama 3.1`,
+      'optimizer': `⚡ OPTIMIZACIÓN COMPLETA (${performanceMultiplier.toFixed(1)}x rendimiento):\n\n${aiResponse}\n\n🚀 Rendimiento mejorado con IA local\n🦙 Powered by Local Phi-3`,
+      'data-master': `📊 ANÁLISIS DE DATOS (${performanceMultiplier.toFixed(1)}x insights):\n\n${aiResponse}\n\n📈 Métricas procesadas localmente\n🦙 Powered by Local Phi-3`,
+      'growth-expert': `🚀 ESTRATEGIA DE CRECIMIENTO (${performanceMultiplier.toFixed(1)}x expansión):\n\n${aiResponse}\n\n📈 Plan de expansión optimizado\n🦙 Powered by Local Llama 3.1`
     };
     
-    return responses[agentType] || `Contenido evolutivo generado para: ${prompt} (${performanceMultiplier.toFixed(1)}x optimizado)`;
+    return responses[agentType] || aiResponse;
   } catch (error) {
-    console.error('MCP processing failed, using fallback:', error);
-    
-    const responses = {
-      'flowi-ceo': `🎯 OBJETIVO ESTRATÉGICO: ${prompt}\n\n✅ Análisis completado\n✅ Estrategia definida\n✅ KPIs establecidos`,
-      'hook-creator': `🔥 HOOK VIRAL GENERADO:\n\n"${prompt}" - ¡Este contenido va a explotar!\n\n💡 Variaciones:\n• Versión corta\n• Versión emocional\n• Versión controversial`,
-      'thumbnail-wizard': `🎨 THUMBNAIL OPTIMIZADO:\n\nConcepto: ${prompt}\n📐 Dimensiones: 1920x1080\n🎨 Paleta: Neón cyberpunk\n⚡ CTR estimado: +45%`,
-      'editor-pro': `✏️ CONTENIDO EDITADO:\n\n${prompt}\n\n📝 Mejoras aplicadas:\n• Gramática optimizada\n• SEO mejorado\n• Engagement aumentado`,
-      'trend-researcher': `📊 ANÁLISIS DE TENDENCIAS:\n\nTema: ${prompt}\n📈 Trending score: 8.7/10\n🔥 Hashtags recomendados\n⏰ Mejor momento para publicar`,
-      'optimizer': `⚡ OPTIMIZACIÓN COMPLETA:\n\n${prompt}\n\n🚀 Rendimiento mejorado:\n• Velocidad +30%\n• Conversión +25%\n• Retención +40%`,
-      'data-master': `📊 ANÁLISIS DE DATOS:\n\nInput: ${prompt}\n\n📈 Métricas clave:\n• Alcance: 50K+\n• Engagement: 12%\n• Conversión: 3.2%`,
-      'growth-expert': `🚀 ESTRATEGIA DE CRECIMIENTO:\n\n${prompt}\n\n📈 Plan de expansión:\n• Audiencia objetivo\n• Canales de distribución\n• Escalabilidad 10x`
-    };
-    
-    return responses[agentType] || `Contenido generado para: ${prompt}`;
+    console.error('All AI processing failed:', error);
+    return `Error: AI processing failed. Please ensure local AI models are running.`;
   }
 }
 
@@ -847,6 +840,44 @@ app.post('/api/ai/optimize-phrase', async (req, res) => {
 app.get('/api/trends', async (req, res) => {
   try {
     const { category = 'general', region = 'global' } = req.query;
+app.get('/api/history', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+    const history = await localAI.getHistory(limit);
+    res.json({
+      history,
+      total: history.length,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('History retrieval error:', error);
+    res.status(500).json({ error: 'Failed to retrieve history' });
+  }
+});
+
+app.post('/api/ai/chat', async (req, res) => {
+  try {
+    const { prompt, agentType = 'flowi-ceo' } = req.body;
+    
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    const response = await localAI.chatWithJan(prompt, agentType);
+    
+    res.json({
+      response,
+      agentType,
+      timestamp: new Date().toISOString(),
+      provider: 'local-jan'
+    });
+  } catch (error) {
+    console.error('Chat error:', error);
+    res.status(500).json({ error: 'Chat service unavailable' });
+  }
+});
+
+
     
     const cached = await aiCacheSystem.get('trends', 'tiktok-analysis', category, { region });
     if (cached) {
@@ -886,6 +917,61 @@ app.get('/api/trends', async (req, res) => {
   }
 });
 
+app.get('/api/local-ai/status', async (req, res) => {
+  try {
+    const status = await localAI.checkServices();
+    res.json({
+      services: status,
+      allRunning: status.ollama && status.stableDiffusion,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/local-ai/generate-thumbnail', async (req, res) => {
+  try {
+    const { prompt, style = 'cyberpunk' } = req.body;
+    
+    const cached = await aiCacheSystem.get('local-sd', 'stable-diffusion-xl', prompt, { style });
+    if (cached) {
+      return res.json(cached);
+    }
+
+    const imageBase64 = await localAI.generateThumbnail(prompt, style);
+    
+    const result = {
+      imageUrl: `data:image/png;base64,${imageBase64}`,
+      prompt,
+      style,
+      provider: 'local-stable-diffusion',
+      timestamp: new Date().toISOString()
+    };
+
+    aiCacheSystem.set('local-sd', 'stable-diffusion-xl', prompt, { style }, result);
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Local Stable Diffusion error:', error);
+    res.status(500).json({ error: 'Local thumbnail generation failed: ' + error.message });
+  }
+});
+
+app.get('/api/local-ai/history', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+    const history = await localAI.getHistory(limit);
+    res.json({
+      history,
+      count: history.length,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/cache/stats', (req, res) => {
   try {
     res.json(aiCacheSystem.getStats());
@@ -906,7 +992,8 @@ app.get('/health', (req, res) => {
       siliconflow: !!process.env.SILICONFLOW_API_KEY,
       netmind: !!process.env.NETMIND_API_KEY,
       huggingface: !!process.env.HUGGINGFACE_API_KEY,
-      bytedance: !!process.env.BYTEDANCE_API_KEY
+      bytedance: !!process.env.BYTEDANCE_API_KEY,
+      localAI: 'enabled'
     },
     cacheStats: aiCacheSystem.getStats()
   });
