@@ -1,0 +1,24 @@
+{
+  "episodicMemory": [],
+  "semanticMemory": {},
+  "workingMemory": {
+    "lastBroadcast": {
+      "id": "1751406760344",
+      "timestamp": "2025-07-01T21:52:40.344Z",
+      "from": "hook-creator",
+      "message": "agent_evolved",
+      "data": {
+        "newPerformance": 1,
+        "skills": {
+          "creativity": 0.5,
+          "accuracy": 0.5,
+          "speed": 0.5,
+          "engagement": 0.5,
+          "virality": 0.5
+        }
+      },
+      "type": "broadcast"
+    }
+  },
+  "lastUpdated": "2025-07-01T21:52:40.345Z"
+}

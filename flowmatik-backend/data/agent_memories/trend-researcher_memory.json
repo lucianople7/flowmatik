@@ -1,0 +1,37 @@
+{
+  "episodicMemory": [],
+  "semanticMemory": {},
+  "workingMemory": {
+    "lastBroadcast": {
+      "id": "1751406760344",
+      "timestamp": "2025-07-01T21:52:40.344Z",
+      "from": "hook-creator",
+      "message": "agent_evolved",
+      "data": {
+        "newPerformance": 1,
+        "skills": {
+          "creativity": 0.6,
+          "accuracy": 0.5,
+          "speed": 0.5,
+          "engagement": 0.5,
+          "virality": 0.5
+        }
+      },
+      "type": "broadcast"
+    },
+    "lastDirectMessage": {
+      "id": "1751406823094",
+      "timestamp": "2025-07-01T21:53:43.094Z",
+      "from": "hook-creator",
+      "to": "trend-researcher",
+      "message": "collaboration_request",
+      "data": {
+        "collaborationId": "hook-creator_trend-researcher_1751406823094",
+        "task": "Create viral TikTok content about fitness trends",
+        "initiator": "hook-creator"
+      },
+      "type": "direct"
+    }
+  },
+  "lastUpdated": "2025-07-01T21:53:43.094Z"
+}

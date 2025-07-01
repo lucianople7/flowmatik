@@ -1,0 +1,29 @@
+{
+  "episodicMemory": [
+    {
+      "id": "1751406794809",
+      "timestamp": "2025-07-01T21:53:14.809Z",
+      "prompt": "Crea un guión viral para TikTok sobre fitness",
+      "response": "🔥 HOOK VIRAL GENERADO (1.0x mejorado):\n\nGuión Viral de Fitness para TikTok - \"La Verdadera Vida del Gigante\":\n\n[Intérprete entra en escena]\n\nInterpretador: ¡Hola, amigos! Este es [nombre], el cual te he acompañado desde la infancia y me encanta hablar de lo que realmente importa. Yo no soy un atleta profesional ni una modelo famosa... Soy común como tú, pero cada día decido hacer algo más para mejorarme físicamente.\n\n[Vídeo corto: El interpretador realizando ejercicios básicos]\n\nInterpretador: Hoy, te invito a unirse al movimiento de la verdadera vida del gigante - donde el esfuerzo diario y constante nos lleva más allá de nuestras fronteras. ¿Listo para levantarte? \n\n[Cortometraje musical con animación]\n\nInterpretador: Cada día, tomamos un paso adelante en esta maravillosa jornada que llamaremos \"La Verdadera Vida del Gigante\". No importa cuán pequeño comiences - cada rep de sentarse y levantar tu peso es una victoria.\n\n[Interpretador montando su propio progreso en un gráfico]\n\nInterpretador: Aprendemos que la verdadera vida del gigante no solo se trata de tener músculos imponentes, sino también fuerza interior y determinación para mejorar a cada día. Así como el sol sale cada mañana sin importar qué tan mal acostumbraremos en dormirnos la noche anterior...\n\n[Animación con música animada]\n\nInterpretador: ¡Encuéntrate de nuevo conmigo pronto para continuar esta maravillosa jornada hacia tu mejor versión! Recuerda, siempre es demasiado difícil levantarse. Pero ¿por qué no intentarlo? 💪\n\n[La música cae]\n\nInterpretador: ¡Feliz trabajo y despertar en la \"Verdadera Vida del Gigante\"!\n\n(Fin de guión)\n\n💡 Variaciones evolutivas generadas\n🧠 Aprendizaje continuo activo\n🦙 Powered by Advanced Phi-3",
+      "feedback": null,
+      "context": {},
+      "success": null
+    }
+  ],
+  "semanticMemory": {
+    "crea_viral_para": {
+      "count": 1,
+      "successRate": 0,
+      "patterns": [],
+      "bestResponses": []
+    }
+  },
+  "workingMemory": {
+    "currentTask": {
+      "prompt": "Crea un guión viral para TikTok sobre fitness",
+      "context": {},
+      "timestamp": "2025-07-01T21:52:52.677Z"
+    }
+  },
+  "lastUpdated": "2025-07-01T21:53:14.809Z"
+}
