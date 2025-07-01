@@ -210,7 +210,35 @@ export default function CommandCenter({ onClose }: CommandCenterProps) {
                   <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                 </div>
-                <span className="text-white font-bold">FLOWMATIK Terminal</span>
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center border border-cyan-400/50 shadow-lg shadow-cyan-400/20">
+                      <svg width="20" height="20" viewBox="0 0 20 20">
+                        <defs>
+                          <linearGradient id="terminalLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#00ffff" />
+                            <stop offset="50%" stopColor="#8b5cf6" />
+                            <stop offset="100%" stopColor="#ec4899" />
+                          </linearGradient>
+                        </defs>
+                        <path d="M3 6 L8 3 L14 6 L17 10 L14 14 L8 17 L3 14 L0 10 Z" 
+                              fill="url(#terminalLogoGradient)" 
+                              className="animate-pulse" />
+                        <circle cx="10" cy="10" r="4" fill="rgba(0,0,0,0.8)" />
+                        <circle cx="10" cy="10" r="2" fill="#00ffff" className="animate-pulse" />
+                      </svg>
+                    </div>
+                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-white font-black text-lg bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-wider">
+                      FLOWMATIK
+                    </span>
+                    <span className="text-xs text-cyan-400/70 font-mono tracking-widest">
+                      TERMINAL
+                    </span>
+                  </div>
+                </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-green-400 text-sm">Online</span>
