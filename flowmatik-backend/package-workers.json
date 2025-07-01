@@ -1,0 +1,17 @@
+{
+  "name": "flowmatik-backend-workers",
+  "version": "1.0.0",
+  "description": "Flowmatik Backend for Cloudflare Workers",
+  "main": "workers-server.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "node workers-server.js"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

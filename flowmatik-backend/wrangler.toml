@@ -7,12 +7,20 @@ compatibility_flags = ["nodejs_compat"]
 binding = "FLOWMATIK_CACHE"
 id = "flowmatik_cache_namespace"
 
+[[kv_namespaces]]
+binding = "AGENT_MEMORY"
+id = "agent_memory_namespace"
+
 [env.production]
 name = "flowmatik-backend-prod"
+routes = [
+  { pattern = "api.flowmatik.co/*", zone_name = "flowmatik.co" }
+]
 
 [[env.production.vars]]
 PORT = "8000"
 NODE_ENV = "production"
+FRONTEND_URL = "https://flowmatik.co"
 
 [env.staging]
 name = "flowmatik-backend-staging"
