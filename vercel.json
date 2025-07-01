@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "flowmatik-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "flowmatik-backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/flowmatik-backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/flowmatik-frontend/dist/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "flowmatik-backend/server.js": {
+      "maxDuration": 30
+    }
+  }
+}
